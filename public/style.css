@@ -55,6 +55,11 @@ code { padding: .1em .4em; border-radius: 6px; background: var(--surface2); font
 .skip:focus { top: 12px; }
 
 /* ---- navigation: a translucent layer, content scrolls under it ---- */
+/* Unofficial notice: first thing on the page, full width */
+.unofficial { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px; padding: 10px 16px; background: var(--fill); color: var(--on-fill); font-size: .9375rem; line-height: 1.4; text-align: center; }
+.unofficial strong { padding: 3px 10px; border: 1.5px solid currentColor; border-radius: 999px; font-size: .8125rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.tag-unofficial { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 18px; padding: 5px 12px; border: 1px solid var(--accent); border-radius: 999px; color: var(--accent); font-size: .8125rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.tag-unofficial .ph { font-size: 1rem; }
 .nav { position: sticky; top: 0; z-index: 40; padding: 12px 16px 0; }
 .nav-inner {
   display: flex; align-items: center; gap: 24px;
