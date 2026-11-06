@@ -148,18 +148,19 @@ section.sites { margin-top: 72px; }
 .group li b { color: var(--ink); font-weight: 600; }
 
 /* ---- who ---- */
-/* From the forum: a row of cards that scrolls sideways. It bleeds to the window edges and starts on the content line. */
+/* From the forum: the cards drift left and loop. The track holds the set twice and moves by exactly one set.
+   It pauses on hover, on keyboard focus, and with the pause button. Reduced motion: it stops and scrolls by hand. */
 main { overflow-x: clip; }
-.carousel { --edge: max(24px, calc((100vw - var(--max)) / 2 + 24px)); position: relative; }
-.qtrack {
-  display: flex; gap: 20px; margin: 0 calc(50% - 50vw); padding: 6px var(--edge) 28px; list-style: none;
-  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--edge);
-  scrollbar-width: none; cursor: grab;
+.carousel { --edge: max(24px, calc((100vw - var(--max)) / 2 + 24px)); --gap: 20px; position: relative; }
+.qviewport {
+  margin: 0 calc(50% - 50vw) -20px; padding: 12px 0 48px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
-.qtrack::-webkit-scrollbar { display: none; }
-.qtrack:focus-visible { outline-offset: -2px; }
-.qtrack.is-dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
-.qcard { flex: 0 0 auto; width: clamp(280px, 28vw, 340px); scroll-snap-align: start; }
+.qtrack { display: flex; gap: var(--gap); width: max-content; margin: 0; padding: 0; list-style: none; animation: qloop 90s linear infinite; will-change: transform; }
+@keyframes qloop { to { transform: translateX(calc(-50% - var(--gap) / 2)); } }
+.qviewport:hover .qtrack, .qviewport:focus-within .qtrack, .carousel.is-paused .qtrack { animation-play-state: paused; }
+.qcard { flex: 0 0 auto; width: clamp(280px, 28vw, 340px); }
 .qcard figure {
   display: flex; flex-direction: column; justify-content: space-between; gap: 32px; height: 100%; min-height: 360px; margin: 0; padding: 32px 28px 28px;
   border: 1px solid var(--line); border-radius: 28px; background: var(--surface);
@@ -179,7 +180,7 @@ main { overflow-x: clip; }
 .qcard-who { display: grid; line-height: 1.3; min-width: 0; }
 .qcard-name { overflow: hidden; color: var(--ink); font-size: .9375rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .qcard-src { color: var(--muted); font-size: .8125rem; }
-.qnav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.qnav { display: flex; justify-content: flex-end; margin-top: 4px; }
 .qbtn {
   display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%;
   background: var(--surface); color: var(--ink); font-size: 1.125rem; cursor: pointer;
@@ -187,7 +188,6 @@ main { overflow-x: clip; }
 }
 .qbtn:hover { background: var(--surface2); }
 .qbtn:active { transform: scale(.94); }
-.qbtn:disabled { opacity: .35; cursor: default; transform: none; background: var(--surface); }
 @media (prefers-color-scheme: dark) {
   .qcard figure { box-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -26px rgba(0, 0, 0, .8); }
   .qcard figure:hover { box-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 28px 56px -28px rgba(0, 0, 0, .9); }
@@ -200,6 +200,9 @@ main { overflow-x: clip; }
 }
 @media (prefers-reduced-motion: reduce) {
   .qcard figure, .qcard figure:hover { transition: none; transform: none; }
+  .qviewport { overflow-x: auto; scrollbar-width: none; -webkit-mask-image: none; mask-image: none; }
+  .qtrack { animation: none; padding: 0 var(--edge); }
+  .qcard[aria-hidden="true"], .qnav { display: none; }
 }
 .who-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin: 0; }
 .who-list dt { display: flex; align-items: center; gap: 10px; font-size: 1.1875rem; font-weight: 600; letter-spacing: -.01em; }
