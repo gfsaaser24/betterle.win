@@ -148,6 +148,16 @@ section.sites { margin-top: 72px; }
 .group li b { color: var(--ink); font-weight: 600; }
 
 /* ---- who ---- */
+/* From the forum: quote cards */
+.quotes { columns: 3 280px; column-gap: 20px; }
+.quote { break-inside: avoid; margin: 0 0 20px; padding: 24px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+.quote blockquote { margin: 0; }
+.quote blockquote p { margin: 0; color: var(--ink); font-size: 1.0625rem; line-height: 1.5; }
+.quote blockquote p::before { content: "\201C"; display: block; margin-bottom: 6px; color: var(--accent); font-size: 2.25rem; font-weight: 700; line-height: .6; }
+.quote figcaption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 16px; font-size: .875rem; }
+.quote-name { color: var(--ink); font-weight: 600; }
+.quote-src { color: var(--muted); }
+.quote-lead blockquote p { font-size: 1.25rem; line-height: 1.45; letter-spacing: -.01em; }
 .who-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin: 0; }
 .who-list dt { display: flex; align-items: center; gap: 10px; font-size: 1.1875rem; font-weight: 600; letter-spacing: -.01em; }
 .who-list dt .ph { color: var(--accent); }
