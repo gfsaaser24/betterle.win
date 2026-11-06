@@ -1,4 +1,4 @@
-// betterle.win: design switcher, scroll entrance, and the release log. Outside text goes in as textContent only.
+// betterle.win: design switcher, scroll entrance, forum comments row, and the release log. Outside text goes in as textContent only.
 (() => {
   document.documentElement.classList.add('js');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -64,6 +64,62 @@
   const firstPlace = () => { if (!thumb) return; thumb.style.transition = 'none'; placeThumb(current); thumb.getBoundingClientRect(); thumb.style.transition = ''; };
   (document.fonts?.ready || Promise.resolve()).then(firstPlace);
   addEventListener('resize', () => placeThumb(tabs.find((t) => t.getAttribute('aria-selected') === 'true')));
+
+  // ---- forum comments: a sideways row. Arrows page by cards; a mouse drag throws it with momentum. ----
+  const car = document.querySelector('[data-carousel]');
+  const track = car?.querySelector('.qtrack');
+  if (track) {
+    const [prev, next] = car.querySelectorAll('.qbtn');
+    const cards = [...track.children];
+    const behavior = () => (reduce.matches ? 'auto' : 'smooth');
+    const starts = () => cards.map((c) => c.offsetLeft - cards[0].offsetLeft);
+    const max = () => track.scrollWidth - track.clientWidth;
+    const sync = () => { prev.disabled = track.scrollLeft <= 2; next.disabled = track.scrollLeft >= max() - 2; };
+    const nearest = (x) => starts().reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a), 0);
+    const page = (dir) => {
+      const step = cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+      const perView = Math.max(1, Math.floor(track.clientWidth / step) - 1);
+      track.scrollTo({ left: Math.min(max(), nearest(track.scrollLeft + dir * step * perView)), behavior: behavior() });
+    };
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+    let ticking = false;
+    track.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; sync(); }); } }, { passive: true });
+    addEventListener('resize', sync);
+    sync();
+    // Mouse drag: the row follows the pointer 1:1, then the release velocity is projected forward
+    // (Apple's decay: v * 0.998 / 0.002 / 1000) and the row settles on the card nearest that point.
+    // Touch and trackpads keep the browser's own scrolling.
+    let drag = null;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      drag = { x: e.clientX, left: track.scrollLeft, hist: [{ x: e.clientX, t: e.timeStamp }], moved: false };
+    });
+    track.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) < 6) return;
+      if (!drag.moved) { drag.moved = true; track.setPointerCapture(e.pointerId); track.classList.add('is-dragging'); }
+      track.scrollLeft = drag.left - dx;
+      drag.hist.push({ x: e.clientX, t: e.timeStamp });
+      if (drag.hist.length > 6) drag.hist.shift();
+    });
+    const end = (e) => {
+      if (!drag) return;
+      const d = drag; drag = null;
+      if (!d.moved) return;
+      const a = d.hist[0], b = d.hist[d.hist.length - 1];
+      const v = b.t > a.t ? -(b.x - a.x) / (b.t - a.t) * 1000 : 0; // px per second, in scroll direction
+      const target = Math.max(0, Math.min(max(), nearest(track.scrollLeft + v * 0.499)));
+      track.scrollTo({ left: target, behavior: behavior() });
+      const done = () => track.classList.remove('is-dragging');
+      if ('onscrollend' in track) track.addEventListener('scrollend', done, { once: true }); else setTimeout(done, 450);
+      if (Math.abs(track.scrollLeft - target) < 1) done();
+      if (e.pointerId !== undefined && track.hasPointerCapture?.(e.pointerId)) track.releasePointerCapture(e.pointerId);
+    };
+    track.addEventListener('pointerup', end);
+    track.addEventListener('pointercancel', end);
+  }
 
   // ---- release log: live from GitHub, with the copy saved at deploy as a fallback ----
   const log = document.querySelector('[data-log]');
