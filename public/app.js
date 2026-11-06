@@ -14,6 +14,41 @@
     parts.forEach((p) => io.observe(p));
   } else parts.forEach((p) => p.classList.add('is-in'));
 
+  // ---- theme picker: Auto, Light, Dark. theme.js applied the saved one before paint. ----
+  const themeApi = window.__betterTheme;
+  const pickBox = document.querySelector('.theme-pick');
+  if (themeApi && pickBox) {
+    const opts = [...pickBox.querySelectorAll('[data-theme-pick]')];
+    const tThumb = pickBox.querySelector('.theme-thumb');
+    const show = (theme, animate) => {
+      const i = Math.max(0, opts.findIndex((o) => o.dataset.themePick === theme));
+      opts.forEach((o, k) => { o.setAttribute('aria-checked', String(k === i)); o.tabIndex = k === i ? 0 : -1; });
+      if (!animate) tThumb.style.transition = 'none';
+      tThumb.style.transform = `translateX(${opts[i].offsetLeft - opts[0].offsetLeft}px)`;
+      if (!animate) { tThumb.getBoundingClientRect(); tThumb.style.transition = ''; }
+    };
+    const choose = (theme, focus) => {
+      if (!reduce.matches) {
+        document.documentElement.classList.add('theme-fading');
+        clearTimeout(choose.t);
+        choose.t = setTimeout(() => document.documentElement.classList.remove('theme-fading'), 400);
+      }
+      themeApi.set(theme);
+      show(theme, true);
+      if (focus) opts.find((o) => o.dataset.themePick === theme)?.focus();
+    };
+    opts.forEach((o, k) => {
+      o.addEventListener('click', () => choose(o.dataset.themePick));
+      o.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        choose(opts[(k + d + opts.length) % opts.length].dataset.themePick, true);
+      });
+    });
+    show(themeApi.get(), false);
+  }
+
   // ---- design switcher: the thumb glides from where it is to the pick ----
   const NOTES = {
     og: 'OG: the stock layout you know, with BetterLET’s features on top and a real dark mode.',

@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <script src="/theme.js"></script>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -38,7 +39,13 @@
         <a href="#install">Install</a>
         <a href="#releases">Releases</a>
       </nav>
-      <a class="btn btn-small" href="https://github.com/gfsaaser24/BetterLET" rel="noopener"><i class="ph ph-github-logo" aria-hidden="true"></i>GitHub</a>
+      <div class="theme-pick" role="radiogroup" aria-label="Theme">
+        <button type="button" role="radio" data-theme-pick="auto" aria-checked="true" aria-label="Auto theme" title="Auto"><i class="ph ph-circle-half" aria-hidden="true"></i></button>
+        <button type="button" role="radio" data-theme-pick="light" aria-checked="false" aria-label="Light theme" title="Light"><i class="ph ph-sun" aria-hidden="true"></i></button>
+        <button type="button" role="radio" data-theme-pick="dark" aria-checked="false" aria-label="Dark theme" title="Dark"><i class="ph ph-moon" aria-hidden="true"></i></button>
+        <span class="theme-thumb" aria-hidden="true"></span>
+      </div>
+      <a class="btn btn-small" href="https://github.com/gfsaaser24/BetterLET" rel="noopener"><i class="ph ph-github-logo" aria-hidden="true"></i><span class="btn-label">GitHub</span></a>
     </div>
   </header>
 
@@ -56,7 +63,7 @@
       </div>
       <figure class="hero-shot reveal">
         <picture>
-          <source srcset="/media/compare-dark.webp" media="(prefers-color-scheme: dark)">
+          <source data-dark-src srcset="/media/compare-dark.webp" media="(prefers-color-scheme: dark)">
           <img src="/media/compare.webp" width="1440" height="1007" alt="The stock LowEndTalk thread list beside the same list in BetterLET's V1 and V2 designs">
         </picture>
       </figure>
@@ -83,7 +90,7 @@
         <p class="design-note" data-note>V1: a three-column layout that reads like a server rack. Status lights show what's new.</p>
         <figure class="design-shot" id="design-shot" role="tabpanel">
           <picture>
-            <source data-dark srcset="/media/v1-dark.webp" media="(prefers-color-scheme: dark)">
+            <source data-dark data-dark-src srcset="/media/v1-dark.webp" media="(prefers-color-scheme: dark)">
             <img data-light src="/media/v1.webp" width="1440" height="1000" alt="BetterLET's V1 design on the LowEndTalk thread list">
           </picture>
         </figure>
